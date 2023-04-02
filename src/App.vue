@@ -1,14 +1,55 @@
 <template>
-    <div class="name" :class="nameClass" >{{ name }}</div>
-    <input :type="type" v-model="name">
-    <button class="btn btn-primary" @click="updateName">click</button>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <form @submit.prevent="onSubmit">
+            <div  class="d-flex">
+                <div class="flex-grow-1 mr-2">
+                    <input class="form-control" type="text" v-model="todo"
+                           placeholder="Type new to-do">
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Add</button>
+                </div>
+            </div>
+            <div v-show="hasError" style="color: red">
+                This field cannot be empty
+            </div>
+        </form>
+        <div v-show="!todos.length">
+            추가된 todo가 없습니다
+        </div>
+        <div class="card mt-2" v-for="(item, index) in todos" :key="item.id">
+            <div class="card-body p-2 d-flex aling-items-center">
+                <div class="form-check flex-grow-1">
+                    <input class="form-check-input" type="checkbox" v-model="item.completed">
+                    <label class="form-check-label"
+                    :class="{ todo: item.completed }"
+                    >
+                        {{ item.subject }}
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-danger btn-sm" @click="deleteTodo(index)">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
 import { ref } from "vue";
 export default {
     setup(){
-        const name = ref('민톨');
+        const todo = ref('');
+        const hasError = ref(false);
+        const todos = ref([]);
+        const todoStyle = {
+            textDecoration: 'line-through',
+            color: 'gray'
+        };
+
         const type = ref('text');
         const nameClass = ref('name');
         /*const type = ref('checkbox');
@@ -26,16 +67,37 @@ export default {
             console.log(name.value);
         }
 
-        const onSubmit = (e) => {
-            name.value = e.target.value;
+        const onSubmit = () => {
+            //name.value = e.target.value;
+            //e.preventDefault();
+            if(todo.value === ''){
+                hasError.value = true;
+            } else{
+                todos.value.push({
+                    id: Date.now(),
+                    subject: todo.value,
+                    completed: false
+                });
+                hasError.value = false;
+                todo.value = '';
+            }
+        }
+
+        const deleteTodo = (index) => {
+            todos.value.splice(index, 1);
+            console.log('delete todo')
         }
 
         return {
-            name,
+            todo,
+            todos,
             updateName,
             onSubmit,
             nameClass,
-            type
+            type,
+            hasError,
+            todoStyle,
+            deleteTodo
         };
     }
 }
@@ -44,5 +106,9 @@ export default {
 <style>
  .name{
      color: blue;
+ }
+ .todo {
+     color: gray;
+     text-decoration: line-through;
  }
 </style>
