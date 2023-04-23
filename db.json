@@ -42,28 +42,8 @@
     },
     {
       "subject": "5",
-      "completed": false,
+      "completed": true,
       "id": 9
-    },
-    {
-      "subject": "6",
-      "completed": false,
-      "id": 10
-    },
-    {
-      "subject": "5",
-      "completed": false,
-      "id": 11
-    },
-    {
-      "subject": "ㅁ",
-      "completed": false,
-      "id": 12
-    },
-    {
-      "subject": "ㅇ",
-      "completed": false,
-      "id": 13
     }
   ],
   "test": [

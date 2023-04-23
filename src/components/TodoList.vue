@@ -3,8 +3,9 @@
         <div class="card-body p-2 d-flex aling-items-center"
              @click="moveToPage(item.id)"
         >
-            <div class="form-check flex-grow-1">
-                <input class="form-check-input" type="checkbox" :checked="item.completed" @change="toggleTodo(index)">
+            <div class="form-check flex-grow-1" style="cursor: pointer">
+                <input class="form-check-input" type="checkbox" :checked="item.completed" @change="toggleTodo(index, $event)"
+                @click.stop>
                 <label class="form-check-label"
                        :class="{ todo: item.completed }"
                 >
@@ -12,7 +13,7 @@
                 </label>
             </div>
             <div>
-                <button class="btn btn-danger btn-sm" @click="deleteTodo(index)">
+                <button class="btn btn-danger btn-sm" @click.stop="deleteTodo(index)">
                     Delete
                 </button>
             </div>
@@ -36,8 +37,8 @@ export default {
             console.log(todoId);
             router.push({name: 'Todo', params: {id: todoId}});
         }
-        const toggleTodo = (index) => {
-            emit('toggle-todo', index);
+        const toggleTodo = (index, event) => {
+            emit('toggle-todo', index, event.target.checked);
         }
         const deleteTodo = (index) => {
             emit('delete-todo', index);
