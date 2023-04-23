@@ -1,7 +1,7 @@
 # vue3practice
-# 현재 스터디 진행중
-# 총 정리
-# https://historical-minute-4ae.notion.site/Vue-js-f0f9ab6e877f4b7795e1117d7c5550c5
+#  <h4>현재 스터디 진행중 </h4>
+#  <h4>총 정리</h4>
+#  <h4>https://historical-minute-4ae.notion.site/Vue-js-f0f9ab6e877f4b7795e1117d7c5550c5</h4>
 
 ## Project setup
 ```
