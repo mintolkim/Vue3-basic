@@ -3,7 +3,9 @@
     <div v-if="loading">
         Loading..
     </div>
-    <form v-else>
+    <form v-else
+    @submit.prevent="onSave"
+    >
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
@@ -25,28 +27,48 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary" :disabled="!todoUpdated">Save</button>
         <button class="btn btn-outline-dark ml-2" @click="moveToTodoListPage">Cancel</button>
     </form>
+    <Toast v-if="showToast" :message="toastMessage" :type="toastAlertType"/>
 </template>
 
 <script>
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import {ref} from "vue";
+import {ref , computed} from "vue";
+import _ from "lodash";
+import Toast from '@/components/Toast.vue';
 
 export default {
+    components : {
+        Toast
+    },
     setup(){
         const route = useRoute();
         const router = useRouter();
         const todo = ref(null); // 처음 null 로 초기화
+        const originalTodo = ref(null);
         const loading = ref(true);
+        const todoId = route.params.id;
+        const showToast = ref(false);
+        const toastMessage = ref('');
+        const toastAlertType = ref('');
 
         const getTodo = async () => {
-           const res = await axios.get('http://localhost:3000/todos/'+route.params.id);
-           todo.value = res.data;
-           loading.value = false;
+            try {
+                const res = await axios.get(`http://localhost:3000/todos/${todoId}`);
+                todo.value = { ...res.data };
+                originalTodo.value = { ...res.data };
+                loading.value = false;
+            } catch (error) {
+                triggerToast('Error', 'danger');
+            }
         }
+
+        const todoUpdated = computed(()=>{
+            return !_.isEqual(todo.value, originalTodo.value);
+        })
         const toggelTodoStatus = () => {
             todo.value.completed = !todo.value.completed;
         }
@@ -58,12 +80,43 @@ export default {
         }
         getTodo();
 
+        const triggerToast = (message, type = 'success') =>{
+            toastMessage.value = message;
+            toastAlertType.value = type;
+            showToast.value = true;
+            setTimeout(() => {
+               toastMessage.value = '';
+               toastAlertType.value = ''; // setTime 할때 리셋
+               showToast.value = false;
+            }, 3000);
+        }
+
+        const onSave = async () =>{
+            try {
+                const res = await axios.put(`http://localhost:3000/todos/${todoId}`, {
+                    subject: todo.value.subject,
+                    completed: todo.value.completed
+                });
+                originalTodo.value = {...res.data};
+                triggerToast('Successfully saved!');
+            } catch (error) {
+                triggerToast(error);
+                triggerToast('Error', 'danger');
+            }
+
+        }
+
         return {
             getTodo,
             todo,
             loading,
             toggelTodoStatus,
-            moveToTodoListPage
+            moveToTodoListPage,
+            onSave,
+            todoUpdated,
+            showToast,
+            toastMessage,
+            toastAlertType
         }
     }
 
