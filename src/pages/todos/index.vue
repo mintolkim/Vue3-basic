@@ -1,5 +1,11 @@
 <template>
     <div>
+        <div class="d-flex justify-content-between mb-3">
+            <h2>To-Do List</h2>
+            <button
+                @click="moveToCreatePage"
+                class="btn btn-primary">Create Todo</button>
+        </div>
         <h2>To-Do List</h2>
         <input
             class="form-control"
@@ -9,9 +15,7 @@
             @keyup.enter="searchTodo"
         >
         <hr />
-        <TodoSimpleForm @add-todo="addTodo" />
         <div style="color: red">{{ error }}</div>
-
         <div v-if="!todos.length">
             There is nothing to display
         </div>
@@ -42,18 +46,25 @@
             </ul>
         </nav>
     </div>
+    <Toast
+        v-if="showToast"
+        :message="toastMessage"
+        :type="toastAlertType"
+    />
 </template>
 
 <script>
 import { ref, computed, watch } from 'vue';
-import TodoSimpleForm from '@/components/TodoSimpleForm.vue';
 import TodoList from '@/components/TodoList.vue';
 import axios from 'axios';
+import Toast from '@/components/Toast.vue';
+import { useToast } from '@/composables/toast';
+import {useRouter} from "vue-router";
 
 export default {
     components: {
-        TodoSimpleForm,
         TodoList,
+        Toast,
     },
     setup() {
         const todos = ref([]);
@@ -65,6 +76,19 @@ export default {
         const numberOfPages = computed(() => {
             return Math.ceil(numberOfTodos.value/limit);
         });
+        const router = useRouter();
+        const moveToCreatePage = () => {
+            router.push({
+                name: 'TodoCreate',
+            })
+        }
+
+        const {
+            toastMessage,
+            toastAlertType,
+            showToast,
+            triggerToast
+        } = useToast();
 
         const getTodos = async (page = currentPage.value) => {
             currentPage.value = page;
@@ -77,6 +101,7 @@ export default {
             } catch (err) {
                 console.log(err);
                 error.value = 'Something went wrong.';
+                triggerToast('Something went wrong', 'danger')
             }
         };
 
@@ -95,6 +120,7 @@ export default {
             } catch (err) {
                 console.log(err);
                 error.value = 'Something went wrong.';
+                triggerToast('Something went wrong', 'danger')
             }
         };
 
@@ -108,6 +134,7 @@ export default {
             } catch (err) {
                 console.log(err);
                 error.value = 'Something went wrong.';
+                triggerToast('Something went wrong', 'danger')
             }
         };
 
@@ -116,13 +143,14 @@ export default {
             const id = todos.value[index].id;
             try {
                 await axios.patch('http://localhost:3000/todos/' + id, {
-                    completed: !todos.value[index].completed
+                    completed: checked
                 });
 
-                todos.value[index].completed = checked;
+                todos.value[index].completed = checked
             } catch (err) {
                 console.log(err);
                 error.value = 'Something went wrong.';
+                triggerToast('Something went wrong', 'danger')
             }
 
         };
@@ -151,6 +179,10 @@ export default {
             numberOfPages,
             currentPage,
             getTodos,
+            toastMessage,
+            toastAlertType,
+            showToast,
+            moveToCreatePage
         };
     }
 }
