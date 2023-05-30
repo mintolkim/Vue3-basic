@@ -1,4 +1,4 @@
-# vue3practice
+# vue3-basic
  <h4>현재 스터디 완료</h4>
  <h4>총 정리</h4>
  <h4>https://historical-minute-4ae.notion.site/Vue3-js-f0f9ab6e877f4b7795e1117d7c5550c5</h4>
